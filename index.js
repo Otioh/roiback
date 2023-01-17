@@ -73,6 +73,23 @@ app.get('/students', (req, res)=>{
 
 
 
+app.get('/programmes',  (req, res)=>{
+    pool.query("SELECT * FROM programmes", (error, result, row)=>{
+          
+        if(error){
+            res.send({...response, message:'Error Fetching Programmes '})
+        }else{
+
+      
+          
+            res.send({...response, message:`Programmes fetched successfully`, status:true, data:result})
+       
+
+        }})
+})
+
+
+
 app.post('/students', (req, res)=>{
     const {first_name, surname, email, password, phone}=req.body;
     let reg_no='RS'+parseInt(Math.random(0,1)*20000);
