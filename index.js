@@ -88,10 +88,26 @@ app.get('/programmes',  (req, res)=>{
         }})
 })
 
+app.get('/payments/:payer',  (req, res)=>{
+    let payer=req.params.payer;
+    pool.query("SELECT * FROM payments WHERE payer ='"+payer+"'", (error, result, row)=>{
+          
+        if(error){
+            res.send({...response, message:'Error Fetching Payments '})
+        }else{
+
+      
+          
+            res.send({...response, message:`Payments fetched successfully`, status:true, data:result})
+       
+
+        }})
+})
+
 
 
 app.post('/students', (req, res)=>{
-    const {first_name, surname, email, password, phone}=req.body;
+    const {first_name, surname, email, password, phone, address, lga, state, gender}=req.body;
     let reg_no='RS'+parseInt(Math.random(0,1)*20000);
     if(first_name==="" || first_name===undefined || surname==="" || surname===undefined || email==="" || email===undefined || phone==="" || phone===undefined || password==="" || password===undefined){
         res.send({...response, message:'All Fields are required'})
@@ -102,7 +118,7 @@ if(result.length>0){
     res.send({...response, message:'User Already Exist with '+email})
 }else{
 
-    pool.query("INSERT INTO `students` (`id`, `first_name`, `surname`, `reg_no`, `email`, `password`, `date_created`) VALUES (NULL, '"+first_name+"', '"+surname+"', '"+reg_no+"', '"+email+"', '"+password+"', '"+new Date().toLocaleDateString()+"');", (error, result, row)=>{
+    pool.query("INSERT INTO `students` (`id`, `first_name`, `surname`, `reg_no`, `email`, `password`, `date_created`, `verify_code`, `verified`, `phone`, `address`, `lga`, `state`, `gender`) VALUES (NULL, '"+first_name+"', '"+surname+"', '"+reg_no+"', '"+email+"', '"+password+"', '"+new Date().toLocaleDateString()+"', '', 'false', '"+phone+"', '"+address+"', '"+lga+"', '"+state+"', '"+gender+"');", (error, result, row)=>{
         if(error){
             res.send({...response, message:'Error Registering New Student'})
         }
@@ -115,6 +131,36 @@ if(result.length>0){
 
        
     }
+})
+
+
+
+
+
+
+app.post('/payments', (req, res)=>{
+    const {payer, description, amount, status, tran_id}=req.body;
+
+    let pay_id='T'+parseInt(Math.random(0,1)*200000);
+
+    pool.query("INSERT INTO `payments` (`id`, `transaction_id`, `description`, `amount`, `payer`, `status`, `date_initiated`, `payment_id`) VALUES (NULL, '"+tran_id+"', '"+description+"', '"+amount+"', '"+payer+"', '"+status+"', '"+new Date() +"', '"+pay_id+"');", (error, result, row)=>{
+        if(error){
+            res.send({...response, message:'Error Posting Payment'})
+        }
+        else{
+            res.send({...response, message:'Payment Processed Successfully', status:true})
+        }
+    })
+       
+    
+})
+
+
+
+
+
+app.get('/play', (req, res)=>{
+    
 })
 
 
