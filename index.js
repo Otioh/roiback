@@ -67,26 +67,40 @@ app.post('/auth', (req, res)=>{
 })
 
 
-app.get('/students', (req, res)=>{
-    res.send('Students')
+app.get('/students/:email', (req, res)=>{
+    pool.query("SELECT * FROM students WHERE email='"+req.params.email+"'", (error, result, row)=>{
+      if(error){
+
+      }else{
+        res.send({...response, message:`Student fetched successfully`, status:true, data:result[0]})
+      }
+    })
 })
 
 
 
 app.get('/programmes',  (req, res)=>{
-    pool.query("SELECT * FROM programmes", (error, result, row)=>{
-          
+    pool.query("SELECT * FROM programmes", (error, result, row)=>{          
         if(error){
             res.send({...response, message:'Error Fetching Programmes '})
-        }else{
-
-      
-          
+        }else{          
             res.send({...response, message:`Programmes fetched successfully`, status:true, data:result})
-       
-
         }})
 })
+
+
+
+
+app.get('/activities',  (req, res)=>{
+    pool.query("SELECT * FROM activities", (error, result, row)=>{          
+        if(error){
+            res.send({...response, message:'Error Fetching Activities '})
+        }else{          
+            res.send({...response, message:`Activities fetched successfully`, status:true, data:result})
+        }})
+})
+
+
 
 app.get('/payments/:payer',  (req, res)=>{
     let payer=req.params.payer;
@@ -95,14 +109,41 @@ app.get('/payments/:payer',  (req, res)=>{
         if(error){
             res.send({...response, message:'Error Fetching Payments '})
         }else{
-
-      
-          
             res.send({...response, message:`Payments fetched successfully`, status:true, data:result})
-       
-
         }})
 })
+
+
+
+
+
+app.get('/programmes/:id',  (req, res)=>{
+    let id=req.params.id;
+    pool.query("SELECT * FROM programmes WHERE id ='"+id+"'", (error, result, row)=>{
+          
+        if(error){
+            res.send({...response, message:'Error Fetching programmes '})
+        }else{
+            res.send({...response, message:`programmes fetched successfully`, status:true, data:result[0]})
+        }})
+})
+
+
+
+
+
+app.get('/certificates/:user',  (req, res)=>{
+    let user=req.params.user;
+    pool.query("SELECT * FROM certificates WHERE user ='"+user+"'", (error, result, row)=>{
+          
+        if(error){
+            res.send({...response, message:'Error Fetching Certificates '})
+        }else{
+            res.send({...response, message:`Certificates fetched successfully`, status:true, data:result})
+        }})
+})
+
+
 
 
 
@@ -118,9 +159,9 @@ if(result.length>0){
     res.send({...response, message:'User Already Exist with '+email})
 }else{
 
-    pool.query("INSERT INTO `students` (`id`, `first_name`, `surname`, `reg_no`, `email`, `password`, `date_created`, `verify_code`, `verified`, `phone`, `address`, `lga`, `state`, `gender`) VALUES (NULL, '"+first_name+"', '"+surname+"', '"+reg_no+"', '"+email+"', '"+password+"', '"+new Date().toLocaleDateString()+"', '', 'false', '"+phone+"', '"+address+"', '"+lga+"', '"+state+"', '"+gender+"');", (error, result, row)=>{
-        if(error){
-            res.send({...response, message:'Error Registering New Student'})
+    pool.query("INSERT INTO `students` (`id`, `first_name`, `surname`, `reg_no`, `email`, `password`, `date_created`, `verify_code`, `verified`, `phone`, `address`, `lga`, `state`, `gender`, `programme`, `activity`) VALUES (NULL, '"+first_name+"', '"+surname+"', '"+reg_no+"', '"+email+"', '"+password+"', '"+new Date().toLocaleDateString()+"', '', 'false', '"+phone+"', '"+address+"', '"+lga+"', '"+state+"', '"+gender+"', '', '');", (error, result, row)=>{
+       if(error){
+             res.send({...response, message:'Error Registering New Student'})
         }
         else{
             res.send({...response, message:'Registered Successfully', status:true})
@@ -135,6 +176,32 @@ if(result.length>0){
 
 
 
+
+
+
+app.post('/students/:email', (req, res)=>{
+    let db={};
+    pool.query("SELECT * FROM students WHERE email='"+req.params.email+"'", (error, result, row)=>{          
+        if(error){
+           
+        }else{    
+        
+  db=result[0]
+  const body ={...db, ...req.body}
+  const {first_name, surname, password, phone, address, lga, state, programme, activity }=body;
+      pool.query("UPDATE students SET first_name='"+first_name+"', surname='"+surname+"', password='"+password+"', phone='"+phone+"', address='"+address+"', lga='"+lga+"', state='"+state+"', programme='"+programme+"', activity='"+activity+"'  WHERE email='"+req.params.email+"';", (error, result, row)=>{
+          if(error){
+              res.send({...response, message:'Error Updating Student'})
+         }
+         else{
+             res.send({...response, message:'Updated Successfully', status:true})
+         }
+      })
+        }})
+
+
+
+})
 
 
 
