@@ -1,6 +1,7 @@
 const express=require('express');
 const mysql=require('mysql');
 const cors=require('cors');
+const path=require('path');
 const pool=mysql.createPool({
     host:'localhost',
     user:'root',
@@ -22,7 +23,9 @@ const response ={
 }
 
 
+app.use("/assets", express.static("assets"));
 
+app.use(express.static(path.join(__dirname, "assets")));
 
 
 
